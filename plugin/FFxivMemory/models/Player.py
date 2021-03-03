@@ -1,8 +1,8 @@
-from .MemoryParseObject import get_memory_lazy_class
+from .MemoryParseObject import get_memory_class
 from .JobGauges import *
 from ..MemoryHandler import MemoryHandler
 
-_Player = get_memory_lazy_class({
+_Player = get_memory_class({
     'localContentId': ('ulong', 88),
     'job': ('byte', 106),
     'str': ('uint', 356),
@@ -22,7 +22,7 @@ _Player = get_memory_lazy_class({
     'spellSpeed': ('uint', 536),
     'craft': ('uint', 632),
     'control': ('uint', 636),
-})
+},clazy=True)
 
 gauges = {
     19: PaladinGauge,  # 骑士,PLD

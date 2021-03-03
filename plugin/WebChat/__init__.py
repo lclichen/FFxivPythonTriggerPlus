@@ -76,7 +76,6 @@ class WebChat(PluginBase):
         return ws
 
     def plugin_onload(self):
-        self.chatLogCache = list()
         self.server_config = self.FPT.storage.data.setdefault('server', dict())
         self.app = web.Application(loop=loop)
         self.app.router.add_route('GET', '/', self.root_handler)
@@ -87,6 +86,9 @@ class WebChat(PluginBase):
         self.clients = dict()
         self.client_count = 0
         self.FPT.register_event("log_event", self.deal_chat_log)
+        self.chatLogCache = []
+
+
 
     def plugin_onunload(self):
         asyncio.run(self.app.shutdown())

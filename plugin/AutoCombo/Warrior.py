@@ -11,7 +11,7 @@ class Warrior(AutoComboBase):
     def warrior_logic(self):
         meActor = self.get_me()
         if meActor is None: return
-        effects = {effect.buffId: effect for effect in meActor.effects if effect.buffId != 0}
+        effects = meActor.effects.get_dict()
         combo_id = self.comboState.actionId
         gauge = self.FPT.api.FFxivMemory.playerInfo.get_gauge()
         use_strength = 1177 in effects or gauge.beast >= 70

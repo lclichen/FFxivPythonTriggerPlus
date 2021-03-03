@@ -9,6 +9,8 @@ from plugin.Teleporter import Teleporter
 from plugin.NamazuServer import NamazuServer
 from plugin.AutoCombo import AutoCombo
 from plugin.WebChat import WebChat
+from plugin.PosLocker import PosLocker
+import logging
 
 
 fpt = FFxivPythonTrigger([
@@ -22,5 +24,7 @@ fpt = FFxivPythonTrigger([
     ZoomPlugin,
     Teleporter,
     AutoCombo,
+    PosLocker,
 ])
+# fpt.logger.print_level=logging.DEBUG
 fpt.start()

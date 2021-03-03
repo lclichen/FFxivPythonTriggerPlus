@@ -1,6 +1,22 @@
 from FFxivPythonTrigger import PluginBase
 import traceback
 
+"""
+provide a service process echo message as commands
+api:    command
+            register(command: str, callback:callable)
+            unregister(command:str)
+
+privide some basic control commands
+command:    @fpt
+format:     /e @fpt [func] [args]...
+functions (*[arg] is optional args):
+    [close]:    shut down the FFxiv Python trigger (recommend!!!!)
+    [raise]:    try to raise an exception
+    [log]:      log something
+                format: /e @fpt log [message]
+"""
+
 class CommandManager(dict):
     def register(self, command, callback):
         if command in self:
@@ -20,6 +36,8 @@ class Command(PluginBase):
             self.FPT._fpt.close()
         elif args[0] == 'raise':
             raise Exception("111aw")
+        elif args[0] == 'log':
+            self.FPT.log(" ".join(args[1:]))
 
     def deal_chat_log(self, event):
         if event.channel_id == 56:
