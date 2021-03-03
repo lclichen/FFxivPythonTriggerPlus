@@ -8,3 +8,4 @@ pycparser==2.20
 pythonnet==2.5.1
 typing-extensions==3.7.4.3
 yarl==1.6.3
+pywin32
