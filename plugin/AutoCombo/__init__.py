@@ -1,12 +1,22 @@
-from . import DarkKnight, RedMage, Warrior, Gunbreaker, Machinist
+from . import DarkKnight, RedMage, Warrior, Gunbreaker, Machinist, Dancer
 
+"""
+command:    @reset_combo
+format:     /e @reset_combo
+effect:     reset key cache
+
+default key settings at:
+./AppData/Plugins/Auto_Combo/data
+format:[row,key]
+"""
 
 class AutoCombo(
     DarkKnight.DarkKnight,
     RedMage.RedMage,
     Warrior.Warrior,
     Gunbreaker.Gunbreaker,
-    Machinist.Machinist
+    Machinist.Machinist,
+    Dancer.Dancer
 ):
     name = "Auto Combo"
     combos = {
@@ -27,5 +37,5 @@ class AutoCombo(
         # 34: SamuraiGauge,  # 武士,SAM
         35: RedMage.RedMage.red_mage_logic,  # 赤魔法师,RDM
         37: Gunbreaker.Gunbreaker.gunbreaker_logic,  # 绝枪战士,GNB
-        # 38: DancerGauge,  # 舞者,DNC
+        38: Dancer.Dancer.dancer_logic,  # 舞者,DNC
     }

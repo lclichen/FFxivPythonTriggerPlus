@@ -1,11 +1,12 @@
 import sys
 import pathlib
 import json
+import os
 
 
 class Storage(object):
     def __init__(self):
-        self.base_path = pathlib.Path(sys.argv[0]).parents[0] / 'AppData'
+        self.base_path = pathlib.Path(os.getcwd()) / 'AppData'
         self.base_path.mkdir(exist_ok=True, parents=True)
 
     def get_plugin_storage(self, name: str):

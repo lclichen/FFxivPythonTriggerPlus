@@ -1,19 +1,24 @@
 from FFxivPythonTrigger import PluginBase
+import logging
+"""
+patch code to skip cutscene in some zone
+command:    @cutscene
+format:     /e @cutscene [p(patch)/d(dispatch)]
+"""
 
 nop = b"\x90\x90"
 pattern = b"\x8B\xD7\x48\x8B\x08\x4C\x8B\x01"
-command="@cutscence"
+command="@cutscene"
 
 class CutsceneSkipper(PluginBase):
     name = "Cutscene Skipper"
 
 
     def plugin_onload(self):
-        self.scanAddress = None
-        self.trigger_id = None
         self.original_0 = None
         self.original_1 = None
         self.scanAddress = self.FPT.api.MemoryHandler.pattern_scan_main_module(pattern)
+        self.FPT.log("found scan address at %s"%hex(self.scanAddress),logging.DEBUG)
         self.FPT.api.command.register(command, self.process_command)
         # self.FPT.register_event("log_event", self.process_command)
 

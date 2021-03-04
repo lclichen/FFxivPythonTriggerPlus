@@ -10,12 +10,11 @@ log_format = "[{lv}]\t[{time}|{name}]\t{msg}"
 time_format = "%H:%M:%S"
 log_file_format = 'log_{int_time}.txt'
 
-loop = asyncio.get_event_loop()
-a_lock = asyncio.Lock()
-
 
 class Logger(object):
-    def __init__(self, log_path: str = None, default_print_level: int = None):
+    def __init__(self,loop, log_path: str = None, default_print_level: int = None):
+        self.loop=loop
+        self.a_lock = asyncio.Lock(loop=loop)
         self.buffer = list()
         if log_path is None:
             self.log_path = None
@@ -32,13 +31,13 @@ class Logger(object):
         if level is None:
             level = logging.INFO
         msg_log = Log(name, msg, level)
-        with await a_lock:
+        with await self.a_lock:
             self.buffer.append(msg_log)
             if level >= self.print_level:
                 print(msg_log)
             if self.log_path is not None:
                 with open(self.log_path, 'a+') as fo:
-                    fo.write(msg_log)
+                    fo.write(str(msg_log))
                     fo.write('\n')
         for recall in self.recalls:
             try:
@@ -50,7 +49,7 @@ class Logger(object):
 
     def log(self, name: str, msg: str, level: int = None):
         # print(Log(name, msg, level))
-        loop.create_task(self.async_log(name, msg, level))
+        self.loop.create_task(self.async_log(name, msg, level))
 
 
 class Log(object):

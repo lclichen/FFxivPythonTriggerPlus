@@ -42,15 +42,16 @@ class BardGauge(get_memory_class({
 
 class DancerGauge(get_memory_class({
     'feathers': ('byte', 0),
+    'esprit': ('byte', 1),
     'step': (get_memory_array('byte', 1, 4, 0), 2),
     'currentStep': ('byte', 6)
 })):
     class Step(Enum):
         none = 0
-        emboite = 1
-        entrechat = 2
-        jete = 3
-        pirouette = 4
+        emboite = 1  # red
+        entrechat = 2  # blue
+        jete = 3  # green
+        pirouette = 4  # yellow
 
 
 class DragoonGauge(get_memory_class({

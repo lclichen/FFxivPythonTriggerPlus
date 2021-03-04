@@ -3,9 +3,10 @@ import pymem
 import struct
 from .ValToBytes import long_to_bytes
 from .models import MemoryParseObject
+import re
 
 pymem.logger.setLevel(logging.ERROR)
-
+special_chars_map = {i for i in b'()[]{}?*+-|^$\\.&~# \t\n\r\v\f'}
 
 def byte_to_sbyte(byte):
     return struct.unpack('b', struct.pack('<i', byte)[:1])[0]
@@ -84,7 +85,26 @@ class MemoryHandler(pymem.Pymem):
     def write_sbyte(self, address: int, value: int):
         return self.write_byte(address, sbyte_to_byte(value))
 
+    @staticmethod
+    def pattern_escape(raw_pattern):
+        return re.escape(raw_pattern).replace(b'\.',b'.')
+
+    @staticmethod
+    def ida_sig_to_pattern(ida_sig:str):
+        ans=[]
+        for s in ida_sig.split(" "):
+            if s=="??":
+                ans.append(46)
+            elif s:
+                temp=int(s,16)
+                if temp in special_chars_map:
+                    ans.append(0x5c)
+                ans.append(temp)
+        return bytes(ans)
+
+
+    get_pointer = staticmethod(MemoryParseObject.get_pointer)
     get_memory_array = staticmethod(MemoryParseObject.get_memory_array)
-    get_memory_lazy_array = staticmethod(MemoryParseObject.get_memory_lazy_array)
+    # get_memory_lazy_array = staticmethod(MemoryParseObject.get_memory_lazy_array)
     get_memory_class = staticmethod(MemoryParseObject.get_memory_class)
-    get_memory_lazy_class = staticmethod(MemoryParseObject.get_memory_lazy_class)
+    # get_memory_lazy_class = staticmethod(MemoryParseObject.get_memory_lazy_class)

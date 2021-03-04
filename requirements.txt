@@ -5,7 +5,7 @@ chardet==3.0.4
 idna==3.1
 multidict==5.1.0
 pycparser==2.20
-Pymem==1.7
 pythonnet==2.5.1
 typing-extensions==3.7.4.3
 yarl==1.6.3
+pywin32

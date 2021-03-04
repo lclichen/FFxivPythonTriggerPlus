@@ -13,7 +13,7 @@ class Gunbreaker(AutoComboBase):
     def gunbreaker_logic(self):
         meActor = self.get_me()
         combo_id = self.comboState.actionId
-        effects = {effect.buffId: effect for effect in meActor.effects if effect.buffId != 0}
+        effects = meActor.effects.get_dict()
         gauge = self.FPT.api.FFxivMemory.playerInfo.get_gauge()
         use_cartridges = 1831 in effects and gauge.cartridges or gauge.cartridges == 2
 
@@ -36,7 +36,7 @@ class Gunbreaker(AutoComboBase):
         self.gunbreaker_combo_logic(effects,gauge.continuationState)
 
     def gunbreaker_combo_logic(self,effects,continuationState):
-        if self.gnb_key['combo_bind'] and (1842 in effects or 1843 in effects  or 1844 in effects):
+        if self.gnb_key['combo_bind'] and (1842 in effects or 1843 in effects or 1844 in effects):
             return self.change_skill(*self.gnb_key['combo'], '续剑')
         if continuationState == 1:
             self.change_skill(*self.gnb_key['combo'], '猛兽爪')

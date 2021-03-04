@@ -11,8 +11,9 @@ from .utils.Storage import Storage
 from .utils.normalToAsync import normal_to_async
 
 check()
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 loop.set_default_executor(ThreadPoolExecutor(max_workers=99))
+asyncio.set_event_loop(loop)
 
 
 class FFxivPythonTrigger(object):
@@ -21,9 +22,9 @@ class FFxivPythonTrigger(object):
         self.api = AttrContainer()
         self.plugin_tasks = list()
         self.events = dict()
-        self.logger = Logger()
         self.storage = Storage()
         self.mainStorage = self.storage.get_core_storage()
+        self.logger = Logger(loop=loop,log_path=self.mainStorage.path)
         atexit.register(self.close)
         try:
             self.register_plugins(plugins if plugins is not None else [])
@@ -97,7 +98,7 @@ class FFxivPythonTrigger(object):
         if inspect.iscoroutinefunction(call):
             self.append_plugin_task(loop.create_task(call(*args, **kwargs)))
         else:
-            loop.create_task(normal_to_async(call, *args, **kwargs))
+            loop.create_task(normal_to_async(loop,call, *args, **kwargs))
 
 
 class PluginContainer(object):
@@ -120,7 +121,10 @@ class PluginContainer(object):
         self.plugin.plugin_onload()
 
     def start(self):
-        self._fpt.append_plugin_task(loop.create_task(self.plugin.plugin_start()))
+        if inspect.iscoroutinefunction(self.plugin.plugin_start):
+            self._fpt.append_plugin_task(loop.create_task(self.plugin.plugin_start()))
+        else:
+            loop.create_task(normal_to_async(loop,self.plugin.plugin_start))
 
     def register_api(self, name, api_object):
         self.apis.append(name)
