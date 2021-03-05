@@ -1,5 +1,6 @@
 from FFxivPythonTrigger import PluginBase
 import traceback
+import logging
 
 """
 provide a service process echo message as commands
@@ -43,8 +44,11 @@ class Command(PluginBase):
         if event.channel_id == 56:
             args = event.message.split(' ')
             if args[0] in self.commands:
+                self.FPT.log(event.message,logging.DEBUG)
                 try:
                     self.commands[args[0]](args[1:])
+                except SystemExit:
+                    raise SystemExit
                 except:
                     self.FPT.log('exception occurred:\n{}'.format(traceback.format_exc()))
 

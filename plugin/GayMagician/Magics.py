@@ -1,19 +1,21 @@
 from os import path
 import clr
 import sys
+
 if getattr(sys, 'frozen', False):
-    res = path.join('res','GayMagician','GayMagician')
+    res = path.join('res', 'GayMagician', 'GayMagician')
 else:
-    res = path.join(path.dirname(path.realpath(__file__)),'res', 'GayMagician')
+    res = path.join(path.dirname(path.realpath(__file__)), 'res', 'GayMagician')
 clr.AddReference(res)
-from GayMagician import GayMagician
+from GayMagician import GayMagician,LocalHook as lh
+
 
 class Magics(object):
     def __init__(self, *argv):
         self.gm = GayMagician()
         self.load_game_process(*argv)
 
-    def load_game_process(self,*argv):
+    def load_game_process(self, *argv):
         self.gm.LoadGameProcess(*argv)
 
     def detach(self):
@@ -34,5 +36,7 @@ class Magics(object):
     def get_sheet_row(self, sheet, rowId: int):
         return self.gm.GetSheetRow(sheet, rowId)
 
-    def use_item(self, item_id, is_hq=False, target=0xE0000000):
-        self.gm.UseItem(item_id, is_hq, target)
+    def call_inject(self, type, call_offset, args):
+        return self.gm.CallInject[type](call_offset, args)
+
+    LocalHook=lh

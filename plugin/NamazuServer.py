@@ -1,11 +1,11 @@
+import logging
+
 from FFxivPythonTrigger import PluginBase
 from aiohttp import web
 import asyncio
 
 default_host = "127.0.0.1"
 default_port = 2019
-loop = asyncio.get_event_loop()
-
 
 class NamazuServer(PluginBase):
     name = "Namazu Server"
@@ -19,16 +19,32 @@ class NamazuServer(PluginBase):
 
     def plugin_onload(self):
         self.server_config = self.FPT.storage.data.setdefault('server', dict())
-        self.app = web.Application(loop=loop)
+        self.app = web.Application()
         self.app.add_routes([web.post('/command', self.command)])
-        self.runner = web.AppRunner(self.app)
-        loop.run_until_complete(self.runner.setup())
+        self.loop = asyncio.new_event_loop()
+        self.work=False
+
+    async def _plugin_onunload(self):
+        await self.runner.shutdown()
+        await self.runner.cleanup()
+        self.FPT.log("Namazu Server closed")
+        self.work = False
 
     def plugin_onunload(self):
-        asyncio.run(self.app.shutdown())
+        asyncio.set_event_loop(self.loop)
+        self.loop.create_task(self._plugin_onunload())
 
-    async def plugin_start(self):
+    async def _plugin_start(self):
+        self.runner = web.AppRunner(self.app)
+        await self.runner.setup()
         host = self.server_config.setdefault('host', default_host)
         port = self.server_config.setdefault('port', default_port)
-        self.FPT.log("Namazu Server will start on %s:%s" % (host, port))
         await web.TCPSite(self.runner, host, port).start()
+        self.FPT.log("Namazu Server started on %s:%s" % (host, port))
+        self.work = True
+        while self.work:
+            await asyncio.sleep(1)
+
+    def plugin_start(self):
+        asyncio.set_event_loop(self.loop)
+        self.loop.run_until_complete(self._plugin_start())

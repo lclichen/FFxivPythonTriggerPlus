@@ -1,6 +1,6 @@
 import json
 import time
-from asyncio import CancelledError
+from asyncio import CancelledError,set_event_loop,new_event_loop,run
 
 from FFxivPythonTrigger import PluginBase
 from aiohttp import web, WSMsgType
@@ -12,7 +12,6 @@ res = Path(sys._MEIPASS)/'res'/'WebChat' if getattr(sys, 'frozen', False) else P
 
 default_host = "127.0.0.1"
 default_port = 2020
-loop = asyncio.get_event_loop()
 
 
 class WebChat(PluginBase):
@@ -77,33 +76,46 @@ class WebChat(PluginBase):
 
     def plugin_onload(self):
         self.server_config = self.FPT.storage.data.setdefault('server', dict())
-        self.app = web.Application(loop=loop)
+        self.app = web.Application()
         self.app.router.add_route('GET', '/', self.root_handler)
         self.app.router.add_route('GET', '/ws', self.ws_handler)
         self.app.router.add_static('/', path=res)
-        self.runner = web.AppRunner(self.app)
-        loop.run_until_complete(self.runner.setup())
         self.clients = dict()
         self.client_count = 0
         self.FPT.register_event("log_event", self.deal_chat_log)
         self.chatLogCache = []
+        self.FPT.guard=False
+        self.loop=new_event_loop()
 
-
+    async def _plugin_onunload(self):
+        await self.runner.shutdown()
+        await self.runner.cleanup()
+        self.FPT.log("WebChat Server closed")
+        self.work = False
 
     def plugin_onunload(self):
-        asyncio.run(self.app.shutdown())
+        asyncio.set_event_loop(self.loop)
+        self.loop.create_task(self._plugin_onunload())
 
-    async def plugin_start(self):
+    async def _plugin_start(self):
+        self.runner = web.AppRunner(self.app)
+        await self.runner.setup()
         host = self.server_config.setdefault('host', default_host)
         port = self.server_config.setdefault('port', default_port)
-        self.FPT.storage.store()
-        self.FPT.log('start WebChat at %s:%s'%(host,port))
         await web.TCPSite(self.runner, host, port).start()
+        self.FPT.log("WebChat Server started on %s:%s" % (host, port))
+        self.work = True
+        while self.work:
+            await asyncio.sleep(1)
 
-    async def deal_chat_log(self, event):
+    def plugin_start(self):
+        asyncio.set_event_loop(self.loop)
+        self.loop.run_until_complete(self._plugin_start())
+
+    def deal_chat_log(self, event):
         data = event.get_dict()
         self.chatLogCache.append(data)
         if len(self.chatLogCache)>500:self.chatLogCache=self.chatLogCache[-200:]
         # print(data)
         for cid, client in self.clients.items():
-            await client.send_json(data)
+            asyncio.run(client.send_json(data))

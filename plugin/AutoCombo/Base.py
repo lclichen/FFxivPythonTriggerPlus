@@ -1,5 +1,5 @@
 from FFxivPythonTrigger import PluginBase
-from asyncio import sleep
+from time import sleep
 import traceback
 import logging
 
@@ -46,7 +46,7 @@ class AutoComboBase(PluginBase):
             self.keyTemp[row][block] = name
             self.FPT.api.Magic.macro_command("/hotbar set \"%s\" %s %s" % (name, row, block))
 
-    async def plugin_start(self):
+    def plugin_start(self):
         self.work = True
         player_info = self.FPT.api.FFxivMemory.playerInfo
         count_error = 0
@@ -62,6 +62,6 @@ class AutoComboBase(PluginBase):
                     break
             else:
                 count_error = 0
-            await sleep(0.1)
+            sleep(0.1)
 
     combos = dict()

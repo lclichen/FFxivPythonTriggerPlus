@@ -28,17 +28,18 @@ class ChatLogEvent(EventBase):
 class ChatLogProcess(object):
     def __init__(self, chatLogMemory):
         self.chatLogMemory = chatLogMemory
-        self.update_sign = self.chatLogMemory.get_update_sign()
-        self.msg_count = self.chatLogMemory.count()
+        self.update_sign = None
+        self.msg_count = None
 
     def check_update(self):
         ans = []
-        new_sign = self.chatLogMemory.get_update_sign()
-        if self.update_sign != new_sign:
-            self.update_sign = new_sign
-            self.msg_count = 0
-        new_count = self.chatLogMemory.count()
-        while self.msg_count < new_count:
-            ans.append(ChatLogEvent(*self.chatLogMemory[self.msg_count]))
-            self.msg_count += 1
+        if self.chatLogMemory.base_addr:
+            new_sign = self.chatLogMemory.get_update_sign()
+            if self.update_sign != new_sign:
+                self.update_sign = new_sign
+                self.msg_count = self.chatLogMemory.count()
+            new_count = self.chatLogMemory.count()
+            while self.msg_count < new_count:
+                ans.append(ChatLogEvent(*self.chatLogMemory[self.msg_count]))
+                self.msg_count += 1
         return ans

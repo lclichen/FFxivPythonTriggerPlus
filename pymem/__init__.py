@@ -5,7 +5,6 @@ import logging
 import platform
 import struct
 import sys
-from win32process import EnumProcessModules, GetModuleFileNameEx
 
 import pymem.exception
 import pymem.memory
@@ -25,6 +24,7 @@ logger.addHandler(ch)
 
 
 def get_python_dll(version):
+    from win32process import EnumProcessModules, GetModuleFileNameEx
     for process in EnumProcessModules(-1):
         name = GetModuleFileNameEx(-1, process)
         if version in name:

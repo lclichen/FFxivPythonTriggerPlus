@@ -15,14 +15,17 @@ class ChatLogMemory(object):
         self.page_ptr = 0
         self.least_length_ptr = 0
         self.data_ptr = 0
-        self.rescan_addr()
+        # self.rescan_addr()
 
     def rescan_addr(self):
         addr = self.handler.scan_pointer_by_pattern(ChatLog_pattern, len(ChatLog_pattern) + 4)
         try:
-            self.base_addr = self.handler.scan_vTable(addr)
+            self.rebase_addr(self.handler.scan_vTable(addr))
         except Exception:
             raise Exception("cannot scan chat log vTable")
+
+    def rebase_addr(self, addr):
+        self.base_addr = addr
         self.count_ptr = self.base_addr + (5 * 4)
         self.page_ptr = self.base_addr + (6 * 4)
         self.check_update_ptr = self.base_addr + (5 * 8)

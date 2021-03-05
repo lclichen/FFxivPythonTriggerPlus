@@ -34,7 +34,7 @@ class ZoomPlugin(PluginBase):
     def process_command(self, args):
         self.FPT.api.Magic.echo_msg(self._process_command(args))
 
-    async def plugin_start(self):
+    def plugin_start(self):
         self.FPT.api.MemoryHandler.write_float(self.addr, float(self.FPT.storage.data["user_default"]))
 
     def _process_command(self, arg):
