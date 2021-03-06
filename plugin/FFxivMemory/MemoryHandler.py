@@ -4,6 +4,7 @@ import struct
 from .ValToBytes import long_to_bytes
 from .models import MemoryParseObject
 import re
+import os
 
 pymem.logger.setLevel(logging.ERROR)
 special_chars_map = {i for i in b'()[]{}?*+-|^$\\.&~# \t\n\r\v\f'}
@@ -26,7 +27,8 @@ class MemoryHandler(pymem.Pymem):
             super().__init__()
             self.open_process_from_id(pid)
         else:
-            super().__init__('ffxiv_dx11.exe')
+            super().__init__()
+            self.open_process_from_id(os.getpid())
 
         self.main_module = pymem.process.module_from_name(self.process_handle, "ffxiv_dx11.exe")
 
@@ -92,8 +94,8 @@ class MemoryHandler(pymem.Pymem):
     @staticmethod
     def ida_sig_to_pattern(ida_sig:str):
         ans=[]
-        for s in ida_sig.split(" "):
-            if s=="??":
+        for s in ida_sig.split(' '):
+            if s and s[0]=='?':
                 ans.append(46)
             elif s:
                 temp=int(s,16)

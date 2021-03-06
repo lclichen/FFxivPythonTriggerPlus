@@ -1,9 +1,13 @@
 from . import DarkKnight, RedMage, Warrior, Gunbreaker, Machinist, Dancer
 
 """
-command:    @reset_combo
-format:     /e @reset_combo
-effect:     reset key cache
+command:    @aCombo
+format:     /e @aCombo [func] [args]...
+functions (*[arg] is optional args):
+    [on]:       active auto combo
+    [off]:      disable auto combo
+    [reset]:    reset key cache
+    
 
 default key settings at:
 ./AppData/Plugins/Auto_Combo/data
