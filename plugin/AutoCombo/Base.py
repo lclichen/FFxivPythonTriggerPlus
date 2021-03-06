@@ -19,6 +19,7 @@ class AutoComboBase(PluginBase):
         self.FPT.api.command.register(command, self.process_command)
         self.action_sheet = self.FPT.api.Magic.get_excel_sheet('Action')
         self.name_cache = dict()
+        self.FPT.storage.data.setdefault('use', True)
         self.use = True
 
     def plugin_onunload(self):
@@ -30,10 +31,12 @@ class AutoComboBase(PluginBase):
 
     def _process_command(self, args):
         if args[0] == "on":
-            self.use = True
+            self.FPT.storage.data['use']=True
+            self.FPT.storage.store()
             return "enabled"
         elif args[0] == "off":
-            self.use = False
+            self.FPT.storage.data['use'] = False
+            self.FPT.storage.store()
             return "disabled"
         elif args[0] == "reset":
             self.keyTemp = {i: {j: None for j in range(12)} for i in range(10)}
@@ -65,7 +68,7 @@ class AutoComboBase(PluginBase):
         player_info = self.FPT.api.FFxivMemory.playerInfo
         count_error = 0
         while self.work:
-            if self.use:
+            if self.FPT.storage.data['use']:
                 try:
                     if player_info.job in self.combos and self.get_me() is not None:
                         self.combos[player_info.job](self)
