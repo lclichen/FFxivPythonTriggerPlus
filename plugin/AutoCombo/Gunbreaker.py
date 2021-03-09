@@ -15,20 +15,15 @@ class Gunbreaker(AutoComboBase):
         combo_id = self.comboState.actionId
         effects = meActor.effects.get_dict()
         gauge = self.FPT.api.FFxivMemory.playerInfo.get_gauge()
-        use_cartridges = 1831 in effects and gauge.cartridges or gauge.cartridges == 2
 
-        if use_cartridges:
-            self.change_skill(*self.gnb_key['single'], '爆发击')
-        elif combo_id == 16137:
+        if combo_id == 16137:
             self.change_skill(*self.gnb_key['single'], '残暴弹', (4, '利刃斩'))
         elif combo_id == 16139:
             self.change_skill(*self.gnb_key['single'], '迅连斩', (26, '利刃斩'))
         else:
             self.change_skill(*self.gnb_key['single'], '利刃斩')
 
-        if meActor.level >= 72 and use_cartridges:
-            self.change_skill(*self.gnb_key['multi'], '命运之环')
-        elif combo_id == 16141:
+        if combo_id == 16141:
             self.change_skill(*self.gnb_key['multi'], '恶魔杀', (40, '恶魔切'))
         else:
             self.change_skill(*self.gnb_key['multi'], '恶魔切')

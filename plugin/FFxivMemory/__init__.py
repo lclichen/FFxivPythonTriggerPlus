@@ -7,7 +7,7 @@ from .TargetManager import get_target_manager
 from FFxivPythonTrigger import PluginBase
 from .Zone import Zone
 from .ChatLogMemory import ChatLogMemory
-import asyncio
+from time import sleep
 
 """
 provide memory access for FFxiv
@@ -57,11 +57,11 @@ class FFxivMemory(PluginBase):
     def plugin_onunload(self):
         self.work = False
 
-    async def plugin_start(self):
+    def plugin_start(self):
         self.work = True
         while self.work:
             events = list()
             events += self.chatLogProcess.check_update()
             for event in events:
                 self.FPT.process_event(event)
-            await asyncio.sleep(0.1)
+            sleep(0.1)
